@@ -2,6 +2,7 @@
 
 // data/repositories/weather_repository_impl.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/error/failure.dart';
@@ -130,38 +131,73 @@ class WeatherRepositoryImpl implements WeatherRepository {
   }
 
 
-  @override
+
+
+
   Future<Either<Failure, WeatherEntity>> getWeatherByCurrentLocation() async {
     try {
+      debugPrint('[Repo] getWeatherByCurrentLocation() called');
+      debugPrint('[Repo] Checking location service...');
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      debugPrint('[Repo] Location service enabled: $serviceEnabled');
+
       if (!serviceEnabled) {
+        debugPrint('[Repo] Location service is OFF, trying cache...');
         final cached = await local.getCachedWeather();
-        if (cached != null) return Right(cached);
+        debugPrint('[Repo] Cached weather exists: ${cached != null}');
+        if (cached != null) {
+          debugPrint('[Repo] Returning cached weather because GPS is OFF');
+          return Right(cached);
+        }
+        debugPrint('[Repo] No cached weather, returning LocationFailure(service off)');
         return const Left(LocationFailure('Location services are off.'));
       }
 
-      final permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
+      debugPrint('[Repo] Permission: $permission');
+
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
+        debugPrint('[Repo] Permission not granted, trying cache...');
         final cached = await local.getCachedWeather();
-        if (cached != null) return Right(cached);
+        debugPrint('[Repo] Cached weather exists: ${cached != null}');
+        if (cached != null) {
+          debugPrint('[Repo] Returning cached weather because permission is missing');
+          return Right(cached);
+        }
+        debugPrint('[Repo] No cached weather, returning LocationFailure(permission)');
         return const Left(LocationFailure('Location permission not granted.'));
       }
 
+      debugPrint('[Repo] Fetching current position...');
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.medium,
       );
+      debugPrint(
+        '[Repo] Position: ${position.latitude}, ${position.longitude}',
+      );
 
-      return await _fetchAndCache(
+      final result = await _fetchAndCache(
         lat: position.latitude,
         lon: position.longitude,
         cityName: 'Current location',
       );
-    } catch (e) {
+
+      debugPrint('[Repo] _fetchAndCache completed');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('[Repo] Exception in getWeatherByCurrentLocation(): $e');
+      debugPrint('[Repo] StackTrace: $stackTrace');
+
       final cached = await local.getCachedWeather();
+      debugPrint('[Repo] Cached weather exists after exception: ${cached != null}');
+
       if (cached != null) {
+        debugPrint('[Repo] Returning cached weather after exception');
         return Right(cached);
       }
+
+      debugPrint('[Repo] No cache after exception, returning LocationFailure');
       return const Left(
         LocationFailure(
           'Could not access location. Enable location permission in phone settings.',

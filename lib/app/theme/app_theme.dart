@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Atmosphere Weather App — centralized theming (no state management,
-/// no external packages). Colors are extracted 1:1 from the provided
-/// Material 3 design tokens (light palette) with a hand-tuned dark
-/// companion palette matching the "Thunderstorm" mockup.
+
 class AppTheme {
   AppTheme._();
 

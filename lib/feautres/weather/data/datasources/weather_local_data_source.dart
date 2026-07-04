@@ -1,5 +1,6 @@
 // data/datasources/weather_local_data_source.dart
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import '../models/weather_model.dart';
 import '../../../../core/hive/hive_service.dart';
@@ -16,6 +17,7 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
   @override
   Future<void> cacheWeather(WeatherModel weather) async {
     final jsonString = jsonEncode(weather.toCacheJson());
+    debugPrint('[Hive] Saving weather for ${weather.cityName}');
     await box.put(HiveService.weatherKey, jsonString);
   }
 
@@ -23,6 +25,7 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
   Future<WeatherModel?> getCachedWeather() async {
     final raw = box.get(HiveService.weatherKey) as String?;
     if (raw == null) return null;
+    debugPrint('[Hive] raw value from box: $raw');
     return WeatherModel.fromCacheJson(raw);
   }
 }
