@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_theme.dart';
 import '../../../../core/location/location_permission_controller.dart';
 import '../../../../core/location/location_permission_state.dart';
+import '../../../news/presentation/pages/widgets/news_dashboard_section.dart';
 import '../../domain/entities/weather_entity.dart';
 import '../providers/city_search_controller.dart';
 import '../providers/weather_controller.dart';
@@ -775,7 +776,18 @@ class _WeatherScreenState extends ConsumerState<WeatherScreen> {
             ];
             final selected = i == _navIndex;
             return GestureDetector(
-              onTap: () => setState(() => _navIndex = i),
+              onTap: () {
+                if (i == 1) {
+                  // If they tap the News icon (index 1), navigate to the DashboardScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const NewsDashboardSection()),
+                  );
+                } else {
+                  // If they tap the Weather icon (index 0), just update the state
+                  setState(() => _navIndex = i);
+                }
+              },
               child: AnimatedScale(
                 scale: selected ? 1.0 : 0.96,
                 duration: const Duration(milliseconds: 160),
