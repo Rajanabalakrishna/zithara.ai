@@ -753,64 +753,7 @@ class _WeatherScreenState extends ConsumerState<WeatherScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        height: 88,
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        decoration: BoxDecoration(
-          color: isDark
-              ? Colors.black.withOpacity(0.18)
-              : Colors.white.withOpacity(0.12),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border(
-            top: BorderSide(color: Colors.white.withOpacity(0.16)),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(4, (i) {
-            const icons = [
-              Icons.dashboard_rounded,
-              Icons.map_rounded,
-              Icons.calendar_month_rounded,
-              Icons.settings_rounded,
-            ];
-            final selected = i == _navIndex;
-            return GestureDetector(
-              onTap: () {
-                if (i == 1) {
-                  // If they tap the News icon (index 1), navigate to the DashboardScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const NewsDashboardSection()),
-                  );
-                } else {
-                  // If they tap the Weather icon (index 0), just update the state
-                  setState(() => _navIndex = i);
-                }
-              },
-              child: AnimatedScale(
-                scale: selected ? 1.0 : 0.96,
-                duration: const Duration(milliseconds: 160),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? colorScheme.primaryContainer
-                        : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icons[i],
-                    color: selected
-                        ? colorScheme.onPrimaryContainer
-                        : Colors.white.withOpacity(0.6),
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
+
     );
   }
 

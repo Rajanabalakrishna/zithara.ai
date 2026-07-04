@@ -1,12 +1,8 @@
-
-
-// lib/feautres/news/domain/entities/news_article.dart
-
 import 'package:hive/hive.dart';
 
 part 'news_article.g.dart';
 
-@HiveType(typeId: 10) // pick an unused typeId
+@HiveType(typeId: 1)
 class NewsArticle extends HiveObject {
   @HiveField(0)
   final String id;
@@ -40,6 +36,7 @@ class NewsArticle extends HiveObject {
   });
 
   NewsArticle copyWith({
+    String? id,
     String? title,
     String? description,
     String? url,
@@ -48,13 +45,25 @@ class NewsArticle extends HiveObject {
     DateTime? publishedAt,
   }) {
     return NewsArticle(
-      id: id,
+      id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       url: url ?? this.url,
       imageUrl: imageUrl ?? this.imageUrl,
       sourceName: sourceName ?? this.sourceName,
       publishedAt: publishedAt ?? this.publishedAt,
+    );
+  }
+
+  NewsArticle clone() {
+    return NewsArticle(
+      id: id,
+      title: title,
+      description: description,
+      url: url,
+      imageUrl: imageUrl,
+      sourceName: sourceName,
+      publishedAt: publishedAt,
     );
   }
 }

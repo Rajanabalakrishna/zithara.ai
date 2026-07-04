@@ -1,9 +1,6 @@
-// lib/feautres/news/data/news_local_data_source.dart
-
 import 'package:hive/hive.dart';
 
 import '../domain/enitites/news_article.dart';
-
 import '../domain/repositories/news_repository.dart';
 
 class NewsLocalDataSource {
@@ -18,9 +15,12 @@ class NewsLocalDataSource {
 
   Future<void> cacheArticles(List<NewsArticle> articles) async {
     await _cacheBox.clear();
+
     for (final article in articles) {
-      await _cacheBox.put(article.id, article);
+      final cacheCopy = article.clone();
+      await _cacheBox.put(cacheCopy.id, cacheCopy);
     }
+
     await _cacheBox.put(
       '_cached_at_',
       NewsArticle(
@@ -40,6 +40,7 @@ class NewsLocalDataSource {
 
     final List<NewsArticle> articles = _cacheBox.values
         .where((article) => article.id != '_cached_at_')
+        .map((article) => article.clone())
         .toList();
 
     if (articles.isEmpty) return null;
@@ -53,15 +54,32 @@ class NewsLocalDataSource {
     );
   }
 
-  Future<List<NewsArticle>> getBookmarks() async {
-    return _bookmarksBox.values.toList();
-  }
-
   Future<void> addBookmark(NewsArticle article) async {
-    await _bookmarksBox.put(article.id, article);
+    final bookmarkCopy = article.clone();
+    await _bookmarksBox.put(bookmarkCopy.id, bookmarkCopy);
   }
 
   Future<void> removeBookmark(NewsArticle article) async {
     await _bookmarksBox.delete(article.id);
+  }
+
+  List<NewsArticle> getBookmarks() {
+    return _bookmarksBox.values
+        .map((article) => article.clone())
+        .toList()
+        .reversed
+        .toList();
+  }
+
+  bool isBookmarked(String articleId) {
+    return _bookmarksBox.containsKey(articleId);
+  }
+
+  Future<void> clearBookmarks() async {
+    await _bookmarksBox.clear();
+  }
+
+  Future<void> clearCache() async {
+    await _cacheBox.clear();
   }
 }

@@ -3,20 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app_bootstrap.dart';
 import 'app/theme/app_theme.dart';
+import 'app/theme/theme_provider.dart';
 import 'core/hive/hive_service.dart';
-import 'core/location/location_permission_gate.dart';
 import 'dashboard_screen.dart';
-import 'feautres/news/presentation/pages/bookmarks_page.dart';
-import 'feautres/weather/presentation/screens/weather_screen.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'app/app_bootstrap.dart';
-import 'app/theme/app_theme.dart';
-import 'core/hive/hive_service.dart';
-import 'feautres/news/presentation/pages/bookmarks_page.dart';
-import 'feautres/weather/presentation/screens/weather_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,20 +15,21 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
-      title: 'News & Weather hub',
+      debugShowCheckedModeBanner: false,
+      title: 'News & Weather Hub',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const WeatherScreen(), // Set WeatherScreen as the initial screen
+      themeMode: themeMode,
 
+      home: const AppShell(),
     );
   }
 }
-
-
